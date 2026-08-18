@@ -57,9 +57,43 @@ def run_agent_turn(
     Returns:
         The LLM's final text response to the user.
     """
-    system_prompt = build_system_prompt(composition_state)
+    system_prompt = """You are a music composition agent.
+    For new music generation, use generate_audio_acestep_v15.
+    For orchestral music, use generate_audio_acestep_v15.
+    Call only tools that are actually provided to you.
+    When asked to compose music, use the appropriate generation tool instead of explaining that music generation is unavailable."""
     tools = get_all_tools_openai()
-    valid_tool_names = set(get_tool_names())
+
+    allowed_tools = {
+        "create_composition_plan",
+        "generate_audio_acestep_v15",
+        "zoom_out",
+        "apply_postproduction",
+        "export_final",
+        "remix_track",
+        "play_audio",
+        "apply_eq",
+        "apply_reverb",
+        "apply_compression",
+        "adjust_volume",
+        "extract_midi_from_audio",
+        "score_audio_quality",
+        "analyze_audio_dimensions",
+        "mix_tracks",
+        "check_training_status",
+    }
+
+    tools = [
+        tool for tool in tools
+        if tool["function"]["name"] in allowed_tools
+    ]
+
+    valid_tool_names = {
+        tool["function"]["name"]
+        for tool in tools
+    }
+
+    print("ACTUAL AGENT TOOLS:", [tool["function"]["name"] for tool in tools])
 
     # Set the composition state for tool executor access
     set_state(composition_state)

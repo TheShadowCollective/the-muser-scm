@@ -27,6 +27,9 @@ import logging
 import os
 import tempfile
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +44,8 @@ from src.orchestrator.config import (
     ACESTEP_V15_THINKING_MODE,
     ACESTEP_V15_LM_TEMPERATURE,
     ACESTEP_V15_LM_CFG_SCALE,
+    ACESTEP_V15_DIT_MODEL,
+    ACESTEP_V15_LM_MODEL,
     ACESTEP_V15_API_URL,
     ACESTEP_V15_API_KEY,
 )
@@ -438,6 +443,8 @@ def _generate_audio_v15_api(
         "batch_size": num_candidates,
         "task_type": task_type,
         "audio_format": "wav",
+        "config_path": ACESTEP_V15_DIT_MODEL,
+        "lm_model_path": ACESTEP_V15_LM_MODEL,
     }
     if bpm is not None:
         payload["bpm"] = bpm
@@ -464,7 +471,9 @@ def _generate_audio_v15_api(
     with urllib.request.urlopen(req, timeout=30) as resp:
         task_data = json.loads(resp.read())
 
-    task_id = task_data.get("task_id")
+    task_info = task_data.get("data", task_data)
+
+    task_id = task_info.get("task_id")
     if not task_id:
         raise RuntimeError(f"API did not return task_id: {task_data}")
 
@@ -478,40 +487,59 @@ def _generate_audio_v15_api(
         time.sleep(poll_interval)
         query_req = urllib.request.Request(
             f"{api_url}/query_result",
-            data=json.dumps({"task_ids": [task_id]}).encode(),
+            data=json.dumps({"task_id_list": [task_id]}).encode(),
             headers=headers,
             method="POST",
         )
         try:
             with urllib.request.urlopen(query_req, timeout=30) as resp:
                 results = json.loads(resp.read())
+            print("QUERY_RESULT RESPONSE:", results)
         except urllib.error.URLError:
             continue
 
-        task_result = results.get(task_id, {})
-        status = task_result.get("status", "pending")
+        data = results.get("data", [])
 
-        if status == "completed":
-            # Download audio files
-            for audio_info in task_result.get("audios", []):
-                audio_url = audio_info.get("url", "")
+        if not data:
+            continue
+
+        task_result = data[0]
+        status = task_result.get("status", 0)
+
+        if status == 1:
+            result_data = json.loads(task_result.get("result", "[]"))
+
+            for audio_info in result_data:
+                audio_url = audio_info.get("file", "")
                 if not audio_url:
                     continue
-                fname = audio_info.get("filename", f"gen_{len(good_paths)}.wav")
+
+                fname = os.path.basename(
+                    urllib.parse.unquote(
+                        urllib.parse.urlparse(audio_url).query.split("path=", 1)[-1]
+                    )
+                )
+
+                if not fname:
+                    fname = f"gen_{len(good_paths)}.wav"
+
                 local_path = os.path.join(output_dir, fname)
+
                 urllib.request.urlretrieve(
-                    f"{api_url}/v1/audio?path={audio_url}",
+                    f"{api_url}{audio_url}",
                     local_path,
                 )
+
                 if os.path.isfile(local_path) and not _is_silent(local_path):
                     good_paths.append(local_path)
+
             break
-        elif status == "failed":
-            logger.error("API task failed: %s", task_result.get("error", "unknown"))
+
+        elif status == 2:
+            logger.error("API task failed: %s", task_result)
             break
 
     return good_paths
-
 
 # ---------------------------------------------------------------------------
 # Public API

@@ -71,7 +71,27 @@ and music tools to compose, arrange, render, and produce music from natural lang
 
 
 def _available_tools() -> str:
-    tools = get_all_tools()
+    tools = [
+        tool for tool in get_all_tools()
+        if tool["name"] in {
+            "create_composition_plan",
+            "generate_audio_acestep_v15",
+            "zoom_out",
+            "apply_postproduction",
+            "export_final",
+            "remix_track",
+            "play_audio",
+            "apply_eq",
+            "apply_reverb",
+            "apply_compression",
+            "adjust_volume",
+            "extract_midi_from_audio",
+            "score_audio_quality",
+            "analyze_audio_dimensions",
+            "mix_tracks",
+            "check_training_status",
+        }
+    ]
     lines = ["## Available Tools\n"]
     for tool in tools:
         lines.append(f"- **{tool['name']}**: {tool['description']}")
@@ -101,8 +121,8 @@ Follow this process for every composition request:
 
 1. **Plan** — ALWAYS create a composition plan first before generating any music
 2. **Generate** — Compose each section using the most appropriate tool:
-   - For classical/orchestral: use NotaGen (`generate_notation_notagen`)
-   - For pop/rock/electronic/vocals: use ACE-Step (`generate_audio_acestep`)
+   - For classical/orchestral: use ACE-Step v1.5 (`generate_audio_acestep_v15`)
+   - For pop/rock/electronic/vocals: use ACE-Step v1.5 (`generate_audio_acestep_v15`)
    - For short precise passages: use `generate_notation_claude`
 3. **Validate** — ALWAYS run `validate_notation` before any rendering step. Fix any errors.
    - After audio generation, call `score_audio_quality` to assess quality grade.
@@ -143,9 +163,9 @@ def _tool_usage_guidance() -> str:
 | Scenario | Tool | Reason |
 |----------|------|--------|
 | Classical piano piece | `generate_notation_notagen` | Best at period styles |
-| Pop song with vocals | `generate_audio_acestep` | Full audio with lyrics |
+| Pop song with vocals | `generate_audio_acestep_v15` | Full audio with lyrics |
 | 4-bar chord progression | `generate_notation_claude` | Precise control needed |
-| Orchestral passage | `generate_notation_notagen` | Complex multi-part writing |
+| Orchestral passage | `generate_audio_acestep_v15` | Full orchestral audio generation |
 | Custom voice character | `generate_audio_acestep_lora` | Trained voice LoRA |
 | Hear generated audio | `play_audio` | Play for the user |
 | Assess audio quality | `score_audio_quality` | Get letter grade A-F |

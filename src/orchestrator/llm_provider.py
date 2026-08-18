@@ -169,6 +169,7 @@ def _call_litellm(
         kwargs["api_base"] = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
     t0 = _time.monotonic()
+
     response = litellm.completion(**kwargs)
     latency_ms = (_time.monotonic() - t0) * 1000.0
 
