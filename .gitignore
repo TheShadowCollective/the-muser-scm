@@ -102,3 +102,6 @@ huggingface-space/
 # Claude Code
 .claude/
 CLAUDE.md
+
+# Local ACE-Step installation and model checkpoints
+models/ace-step-v15/
