@@ -12,7 +12,7 @@ The goal of this fork is to preserve the original Muser workflow while providing
 - Added an ACE-Step XL Turbo launcher.
 - Improved handling of local ACE-Step installations and model files.
 - Maintains the original Muser repository as upstream for future updates.
-- Added:
+- Added compatibility for:
   - torch: 2.13.0+cu130
   - cuda: 13.0
 
