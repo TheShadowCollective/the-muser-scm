@@ -12,6 +12,9 @@ The goal of this fork is to preserve the original Muser workflow while providing
 - Added an ACE-Step XL Turbo launcher.
 - Improved handling of local ACE-Step installations and model files.
 - Maintains the original Muser repository as upstream for future updates.
+- Added:
+  - torch: 2.13.0+cu130
+  - cuda: 13.0
 
 This fork will continue to evolve as part of TheShadowCollective production toolchain. Planned work includes dependency modernization and integration in external software.
 
