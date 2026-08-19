@@ -15,6 +15,7 @@ The goal of this fork is to preserve the original Muser workflow while providing
 - Added compatibility for:
   - torch: 2.13.0+cu130
   - cuda: 13.0
+  - transformers: 4.50.0
 
 This fork will continue to evolve as part of TheShadowCollective production toolchain. Planned work includes dependency modernization and integration in external software.
 
