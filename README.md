@@ -1,5 +1,22 @@
 # The Muser
 
+## TheShadowCollective Enhanced Fork
+
+This repository is a production-focused fork of [The Muser](https://github.com/noah-chelednik/the-muser), maintained by TheShadowCollective.
+
+The goal of this fork is to preserve the original Muser workflow while providing fixes and enhancements validated in a working Windows / NVIDIA production environment.
+
+### Current Enhancements
+
+- Fixed ACE-Step v1.5 integration issues encountered during real-world installation and use.
+- Added an ACE-Step XL Turbo launcher.
+- Improved handling of local ACE-Step installations and model files.
+- Maintains the original Muser repository as upstream for future updates.
+
+This fork will continue to evolve as part of TheShadowCollective production toolchain. Planned work includes dependency modernization and integration in external software.
+
+> **Status:** ACE-Step v1.5 integration has been validated and is currently working in production.
+
 **The open-source alternative to Suno and ElevenLabs Music.**
 Run locally. Own everything. No subscriptions, no ToS, no limits.
 
