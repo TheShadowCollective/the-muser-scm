@@ -7,10 +7,10 @@ software and models. Each component retains its original license.
 LLM Orchestration
 ================================================================================
 
-Qwen3-30B-A3B — Primary Orchestration LLM
+Qwen3-14B — Primary SCM Orchestration LLM
   License: Apache License 2.0
-  Source: https://huggingface.co/Qwen/Qwen3-30B-A3B
-  Usage: Local inference via Ollama for agentic composition orchestration
+  Source: https://huggingface.co/Qwen/Qwen3-14B
+  Usage: Local inference via Ollama for Muser SCM orchestration
 
 Ollama — Local LLM Server
   License: MIT License
@@ -20,7 +20,7 @@ Ollama — Local LLM Server
 LiteLLM — LLM Provider Abstraction
   License: MIT License
   Source: https://github.com/BerriAI/litellm
-  Usage: Provider-agnostic routing between Ollama, Groq, Gemini, Anthropic
+  Usage: LLM provider abstraction inherited from the original Muser framework
 
 ================================================================================
 AI Models

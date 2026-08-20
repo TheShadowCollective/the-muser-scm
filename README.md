@@ -7,141 +7,310 @@ Describe what you want to hear in natural language, and The Muser orchestrates
 AI models to produce scores, audio, and vocal performances — entirely on your
 hardware.
 
-## Quick Start
+## Quick Start — Windows SCM
 
-```bash
-pip install -e "."
-ollama pull qwen3:30b-a3b
-bash scripts/setup_models.sh
-muser
+The Muser SCM edition is designed to handle its own setup. You do not need to manually create Python environments, install Ollama, download the orchestration model, or configure ACE-Step.
+
+### Before You Begin
+
+**Recommended hardware**
+
+- Windows 10 or Windows 11
+- NVIDIA GPU
+- **16 GB VRAM or more recommended**
+- **60 GB or more free disk space recommended**
+
+The current SCM configuration has been developed and tested on an NVIDIA GeForce RTX 5060 Ti with 16 GB VRAM.
+
+### Disk Space
+
+Muser is a small application, but the AI models and supporting environments are not.
+
+A fresh installation measured during testing required approximately **43 GB** after the components and models required for generation were installed.
+
+We recommend having at least **60 GB of free disk space** before beginning. Additional models, updates, caches, and generated music will require additional space.
+
+### Install
+
+Clone the SCM branch:
+
+```bat
+git clone -b scm-modernization https://github.com/TheShadowCollective/the-muser-scm.git
+cd the-muser-scm
 ```
 
-> **You:** Compose a 2-minute lo-fi hip hop beat with jazzy piano and vinyl crackle
->
-> The Muser generates candidates, selects the best, and exports production-ready audio.
+Then run:
+
+```bat
+Start_Muser.bat
+```
+
+On first launch, Muser will guide you through setup and automatically handle the required components, including:
+
+- The Muser Python environment
+- Ollama, if it is not already installed
+- The `qwen3:14b` orchestration model
+- ACE-Step SCM
+- Required Python dependencies
+- Hardware detection and an appropriate ACE-Step configuration
+
+Some large ACE-Step models are downloaded when they are first required, so the first music generation may take substantially longer than later generations.
+
+Once setup is complete, you will see:
+
+```text
+You:
+```
+
+Simply describe the music you want to create. For example:
+
+> **You:** Create a slow cinematic orchestral piece with emotional strings, soft piano, and a powerful dramatic ending.
+
+Muser handles the underlying generation tools for you.
+
+
 
 ## What It Does
 
+Muser lets you describe the music you want in natural language and coordinates the local AI models required to create it.
+
+```text
+User
+  │
+  ▼
+Muser
+  │
+  ├── qwen3:14b via Ollama
+  │       Interprets the request
+  │       Plans the generation
+  │       Controls the available tools
+  │
+  ▼
+ACE-Step SCM
+  │
+  ├── Hardware-aware configuration
+  ├── Music generation
+  └── Audio output
+  │
+  ▼
+Your Music
 ```
-User ──► LLM Agent (46 tools) ──► AI Models ──► Your Music
-              │                        │
-         Plans, validates,        NotaGen (notation)
-         iterates, mixes         ACE-Step (audio)
-                                 DiffSinger (vocals)
-                                 RVC (voice cloning)
-```
 
-- **Natural language composition** — describe music in plain English, get professional output
-- **46-tool vocabulary** — generation, validation, rendering, voice, effects, mixing, curation
-- **Multiple AI models** — NotaGen for classical notation, ACE-Step for modern audio, DiffSinger for singing
-- **Full voice pipeline** — RVC voice conversion, Demucs stem separation, feminization presets
-- **Quality scoring** — 9-metric analysis with letter grades, best-of-N candidate selection
-- **Audio-to-MIDI bridge** — extract sheet music from generated audio
-- **Individual effects** — EQ, reverb, compression, volume, mixing — all controllable by the LLM
-- **12-dimension curation** — hard gates + soft scores for batch quality control
-- **Web UI** — Gradio interface with chat, audio player, and composition status
-- **Streaming** — token-by-token LLM responses, no more staring at spinners
+The current Windows SCM workflow provides:
 
-## Output Ownership
+- **Natural-language music creation** — describe the music you want instead of manually configuring generation parameters.
+- **Local orchestration** — `qwen3:14b` runs locally through Ollama.
+- **ACE-Step SCM integration** — Muser communicates with the locally hosted ACE-Step generation backend.
+- **Hardware-aware quality profiles** — generation settings are selected according to detected GPU capabilities and available VRAM.
+- **Automated first-time setup** — Muser can prepare its Python environment, install Ollama, download `qwen3:14b`, configure ACE-Step SCM, and start the required services.
+- **Local generation** — the orchestration and music-generation workflow runs on your own hardware.
 
-Every default generation path produces commercially-safe output:
+## Output and Licensing
 
-| Path | License | Commercial Use |
-|---|---|---|
-| ACE-Step audio | Apache 2.0 | **YES** |
-| NotaGen notation | MIT | **YES** |
-| DiffSinger + Griffin-Lim (default) | Apache 2.0 | **YES** |
-| RVC voice conversion | MIT | **YES** |
-| FluidSynth/sfizz rendering | LGPL/BSD | **YES** |
+Muser SCM runs its orchestration and music-generation workflow locally using open-source software and locally installed AI models.
 
-See [docs/legal.md](docs/legal.md) for the full breakdown including optional components.
+The Muser framework, ACE-Step, Ollama, AI model weights, and other dependencies are separate components and may be distributed under different licenses and terms.
+
+Users are responsible for reviewing the licenses and usage terms applicable to the software and models they use, particularly when generated material is intended for commercial distribution.
+
+See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) and [docs/legal.md](docs/legal.md) for the licensing information currently included with this repository.
+
+
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.10+
-- NVIDIA GPU with 24GB VRAM (for full pipeline) or CPU-only (LLM orchestration)
-- [Ollama](https://ollama.com) for local LLM inference
-- ffmpeg, FluidSynth (for audio rendering)
+For the Windows SCM edition, most software prerequisites are installed or configured automatically by `Start_Muser.bat`.
 
-### Full Install
+**Recommended:**
 
-```bash
-git clone https://github.com/noah-chelednik/the-muser.git
-cd the-muser
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[gpu,voice]"       # GPU + voice pipeline
-bash scripts/setup_environment.sh   # System tools + Ollama
-bash scripts/setup_models.sh        # AI model weights
-cp .env.example .env                # Edit as needed
+- Windows 10 or Windows 11
+- NVIDIA GPU with **16 GB VRAM or more**
+- **60 GB or more free disk space**
+- Internet connection for first-time setup and model downloads
+- Git, for cloning and updating the repository
+
+The validated SCM setup uses Python 3.14, a CUDA 13-compatible PyTorch stack, Ollama with `qwen3:14b`, and the ACE-Step SCM environment. The startup and setup scripts configure these components where applicable.
+
+You do **not** need to manually install Ollama or download `qwen3:14b` before starting Muser. If they are missing, Muser will offer to install them during first-time setup.
+
+### Full Install — Windows SCM
+
+The Windows SCM edition uses an automated setup process.
+
+Clone the SCM branch:
+
+```bat
+git clone -b scm-modernization https://github.com/TheShadowCollective/the-muser-scm.git
+cd the-muser-scm
 ```
 
-### Docker
+Start Muser:
 
-```bash
-docker-compose up muser-gpu    # GPU mode (requires NVIDIA Container Toolkit)
-docker-compose up muser-cpu    # CPU-only mode
-docker-compose up muser-web    # Web UI at http://localhost:7860
+```bat
+Start_Muser.bat
 ```
+
+On a first-time installation, Muser will:
+
+1. Display the expected storage requirements before installation begins.
+2. Create and configure the validated Muser Python environment.
+3. Detect whether Ollama is installed and offer to install it if necessary.
+4. Start the Ollama service if required.
+5. Detect whether `qwen3:14b` is installed and offer to download it if necessary.
+6. Install and configure ACE-Step SCM.
+7. Detect the NVIDIA GPU and available VRAM.
+8. Present hardware-aware ACE-Step quality profiles.
+9. Start the ACE-Step API.
+10. Launch the interactive Muser interface.
+
+No manual Python environment setup or model installation should be necessary during the normal Windows SCM installation process.
+
+#### ACE-Step Quality Profiles
+
+At startup, Muser provides the following generation profiles:
+
+| Profile | ACE-Step Model | Steps | Language Model |
+|---|---|---:|---|
+| Fast | Turbo | 8 | 0.6B |
+| Balanced | XL-Turbo | 20 | GPU-recommended LM |
+| High Quality | XL-SFT | 50 | GPU-recommended LM |
+| Maximum Quality | XL-SFT | 50 | 4B |
+| Auto Detect | XL-SFT | 50 | GPU-recommended LM |
+
+**Auto Detect** is the recommended default. Muser uses ACE-Step's detected GPU tier and available VRAM to select the recommended language model.
+
+> **Note:** Maximum Quality may select a language model beyond the recommended configuration for your GPU. Use it only when sufficient VRAM is available.
 
 ## Usage
 
-### CLI
+Start Muser by running:
 
-```bash
-muser                           # Interactive session
-muser -c my-piece               # Resume a composition
-muser --stream                  # Streaming responses (default)
-muser -m groq/llama-3.3-70b    # Use a specific LLM provider
+```bat
+Start_Muser.bat
 ```
 
-### Web UI
+After the required services and models are ready, Muser will display the interactive prompt:
 
-```bash
-muser-web                       # Launch at http://localhost:7860
+```text
+You:
 ```
 
-### LLM Providers
+Describe the music you want in ordinary language.
 
-No paid API key required. The Muser routes to the best available provider:
+For example:
 
-| Provider | Speed | Cost | Setup |
-|---|---|---|---|
-| Groq | 300+ tok/s | Free tier | Set `GROQ_API_KEY` |
-| Cerebras | 1000+ tok/s | Free tier | Set `CEREBRAS_API_KEY` |
-| Gemini | Fast | Free tier | Set `GOOGLE_API_KEY` |
-| Ollama (local) | 12-28 tok/s | Free forever | `ollama pull qwen3:30b-a3b` |
+> **You:** Create a dark cinematic orchestral piece with low strings, distant percussion, and a slow build into a powerful dramatic climax.
+
+Muser interprets your request and coordinates the underlying AI music-generation tools automatically.
+
+### During Generation
+
+The first generation may take longer because ACE-Step may need to download model files that have not yet been cached locally.
+
+Keep both the **Muser** terminal and the **ACE-Step API** terminal open while using the current command-line version. Closing the ACE-Step API terminal will stop the generation backend and prevent Muser from completing requests.
+
+Generated music is written to Muser's output/export location.
+
+### Orchestration Model
+
+The SCM edition uses the locally hosted:
+
+```text
+qwen3:14b
+```
+
+model through Ollama for Muser's natural-language orchestration.
+
+Ollama and `qwen3:14b` are checked automatically during startup and can be installed or downloaded by Muser when missing.
+
+
 
 ## Architecture
 
-```
-src/
-  orchestrator/    LLM agent loop, 46 tools, composition state
-  generation/      AI model wrappers (NotaGen, ACE-Step, DiffSinger)
-  audio/           Rendering, validation, effects, mixing, export
-  notation/        Format conversion, theory validation, score rendering
-  voice/           Voice conversion (RVC, Seed-VC), stem separation
-  curation/        12-dimension quality analysis, batch curation
-  web/             Gradio web interface
+The Muser SCM edition keeps natural-language orchestration separate from music generation.
+
+```text
+User
+ │
+ ▼
+Muser
+ │
+ ├── qwen3:14b via Ollama
+ │       Natural-language orchestration
+ │
+ ▼
+ACE-Step SCM API
+ │
+ ├── Hardware-aware model selection
+ ├── ACE-Step language model
+ └── ACE-Step diffusion model
+ │
+ ▼
+Generated Audio
 ```
 
-See [docs/architecture.md](docs/architecture.md) for the full system design.
+### Component Responsibilities
 
-## Testing
+**Muser**  
+Provides the interactive natural-language interface and translates the user's musical request into generation instructions.
 
-```bash
-pytest tests/ -v -m "not gpu"   # 258+ tests, ~6 seconds
-```
+**Ollama + qwen3:14b**  
+Runs the local language model used by Muser for orchestration and tool selection.
+
+**ACE-Step SCM**  
+Provides the music-generation backend. The SCM environment includes compatibility work for the modern Python, PyTorch, CUDA, Transformers, and related dependency stack used by this project.
+
+**Start_Muser.bat**  
+Acts as the current Windows launcher and first-time setup manager. It checks the required components, performs installation when necessary, detects available GPU hardware, selects generation settings, starts the required services, and launches Muser.
+
+### Current Interface
+
+The current SCM build uses a command-line interface. Muser and the ACE-Step API run in separate terminal processes during operation.
+
+
+
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style,
-and the tool-adding guide.
+This repository contains an SCM-modernized version of Muser focused on the Windows NVIDIA/CUDA environment used and validated by The Shadow Collective.
+
+Contributions, testing, bug reports, and compatibility improvements are welcome.
+
+When reporting an issue, please include relevant system information when possible, including:
+
+- Windows version
+- NVIDIA GPU model
+- Available VRAM
+- NVIDIA driver version
+- The selected ACE-Step quality profile
+- Relevant Muser or ACE-Step error output
+
+The SCM environment intentionally uses a modern dependency stack and includes compatibility changes required to run ACE-Step with that environment. Please avoid replacing or downgrading validated dependencies without first confirming that the complete Muser and ACE-Step generation pipeline continues to work.
+
+
+
+## Credits
+
+The Muser SCM edition is based on the original open-source **The Muser** project:
+
+https://github.com/noah-chelednik/the-muser
+
+The Shadow Collective did not create the original Muser framework. This repository contains modifications and modernization work performed for The Shadow Collective's local AI production environment, including the Windows SCM setup workflow, modern dependency compatibility work, ACE-Step SCM integration, hardware-aware generation profiles, and automated local setup.
+
+Muser also relies on other open-source projects and AI models, including **ACE-Step** and **Ollama**. Their respective licenses and attribution requirements remain applicable.
+
+The Shadow Collective gratefully acknowledges the developers and contributors whose open-source work made this project possible.
 
 ## License
 
-[MIT](LICENSE) — The Muser framework and all original code.
+The original Muser framework and original Muser code are distributed under the **MIT License**.
 
-See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for component licenses
-and [docs/legal.md](docs/legal.md) for output ownership details.
+See [LICENSE](LICENSE) for the license included with this repository.
+
+Third-party components, models, libraries, and dependencies remain subject to their own licenses and terms.
+
+See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for third-party licensing information and [docs/legal.md](docs/legal.md) for additional information regarding components and output ownership.
+
+Modifications contributed by The Shadow Collective do not alter or supersede the licenses of the original Muser project or any third-party components.

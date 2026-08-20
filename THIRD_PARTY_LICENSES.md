@@ -5,8 +5,13 @@ See [NOTICE](NOTICE) for full attribution text.
 
 ## Core Framework (MIT)
 
-The Muser itself is MIT-licensed. All code in `src/` is original work by
-The Muser Contributors.
+The original Muser framework is MIT-licensed. The original code in `src/`
+was created by The Muser Contributors.
+
+The Muser SCM edition contains additional modifications and compatibility
+work contributed by The Shadow Collective. These modifications do not alter
+or supersede the licenses or attribution requirements of the original Muser
+project or any third-party components.
 
 ## AI Models
 
