@@ -3,11 +3,44 @@ setlocal EnableDelayedExpansion
 title Muser - Orchestral Composer
 cd /d "%~dp0"
 
+
 REM ------------------------------------------------------------
 REM Make sure the Muser SCM environment exists
 REM ------------------------------------------------------------
 
 if not exist ".venv-scm\Scripts\python.exe" (
+    echo.
+    echo ============================================================
+    echo                 MUSER STORAGE REQUIREMENTS
+    echo ============================================================
+    echo.
+    echo A complete Muser installation requires substantial disk space.
+    echo.
+    echo   Measured fresh installation : approximately 43 GB
+    echo   Recommended free disk space : 60 GB or more
+    echo.
+    echo This includes Muser, ACE-Step SCM, Ollama, qwen3:14b,
+    echo Python dependencies, and the models required for generation.
+    echo.
+    echo Additional models, updates, and generated music will require
+    echo additional disk space.
+    echo.
+    echo ============================================================
+    echo.
+
+    set "CONTINUE_SETUP="
+    set /p "CONTINUE_SETUP=Continue with first-time setup? [Y/n]: "
+
+    if "!CONTINUE_SETUP!"=="" set "CONTINUE_SETUP=Y"
+
+    if /I not "!CONTINUE_SETUP!"=="Y" (
+        echo.
+        echo Muser setup cancelled.
+        echo.
+        exit /b 0
+    )
+    echo.
+
     echo.
     echo Muser SCM environment is not installed.
     echo Creating Muser environment...
