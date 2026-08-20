@@ -270,7 +270,7 @@ V15_TOOLS = [
             "Generate audio using ACE-Step v1.5 with LLM pre-planning, "
             "native batch generation, and metadata-aware conditioning. "
             "Supports BPM, key, and time signature parameters. "
-            "Use inference_steps=8 for turbo drafts, 50 for final quality. "
+            "Inference quality is controlled by the selected Muser ACE-Step quality profile. "
             "Tags should be descriptive paragraphs (50-150 words). "
             "Requires GPU; will unload other models from VRAM."
         ),
@@ -302,10 +302,6 @@ V15_TOOLS = [
                 "seed": {
                     "type": "integer",
                     "description": "Random seed for reproducibility (-1 for random)",
-                },
-                "infer_step": {
-                    "type": "integer",
-                    "description": "Inference steps. 8=turbo draft, 50=quality. Default: 8.",
                 },
                 "guidance_scale": {
                     "type": "number",

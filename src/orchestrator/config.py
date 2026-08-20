@@ -104,7 +104,7 @@ DIFFSINGER_TIMEOUT = int(os.environ.get("MUSER_DIFFSINGER_TIMEOUT", "300"))
 # ACE-Step v1.5 settings
 # ---------------------------------------------------------------------------
 ACESTEP_VERSION = os.environ.get("MUSER_ACESTEP_VERSION", "v15")
-ACESTEP_V15_DIT_MODEL = os.environ.get("MUSER_ACESTEP_DIT_MODEL", "acestep-v15-sft")
+ACESTEP_V15_DIT_MODEL = os.environ.get("MUSER_ACESTEP_DIT_MODEL", "acestep-v15-xl-sft")
 ACESTEP_V15_LM_MODEL = os.environ.get("MUSER_ACESTEP_LM_MODEL", "acestep-5Hz-lm-1.7B")
 ACESTEP_V15_LM_TEMPERATURE = float(os.environ.get("MUSER_ACESTEP_LM_TEMP", "0.85"))
 ACESTEP_V15_LM_CFG_SCALE = float(os.environ.get("MUSER_ACESTEP_LM_CFG", "2.0"))

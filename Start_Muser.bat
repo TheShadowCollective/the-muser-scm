@@ -145,6 +145,119 @@ if not exist "%ACESTEP_DIR%\scripts\scm\bootstrap_scm_environment.bat" (
 )
 
 REM ------------------------------------------------------------
+REM Detect ACE-Step hardware profile
+REM ------------------------------------------------------------
+
+echo.
+echo Detecting ACE-Step GPU configuration...
+
+set "GPU_INFO_FILE=%TEMP%\muser_gpu_info.txt"
+
+"%ACESTEP_DIR%\.venv-scm\Scripts\python.exe" -c "from acestep.gpu_config import get_gpu_config; c=get_gpu_config(); print(c.tier); print(round(c.gpu_memory_gb,1)); print(c.recommended_lm_model); print(','.join(c.available_lm_models))" > "%GPU_INFO_FILE%" 2>nul
+
+if errorlevel 1 (
+    echo.
+    echo [ERROR] Could not determine ACE-Step GPU configuration.
+    echo.
+    pause
+    exit /b 1
+)
+
+set /p GPU_TIER=<"%GPU_INFO_FILE%"
+
+for /f "skip=1 tokens=*" %%A in (%GPU_INFO_FILE%) do (
+    if not defined GPU_VRAM (
+        set "GPU_VRAM=%%A"
+    ) else if not defined GPU_RECOMMENDED_LM (
+        set "GPU_RECOMMENDED_LM=%%A"
+    ) else if not defined GPU_AVAILABLE_LM (
+        set "GPU_AVAILABLE_LM=%%A"
+    )
+)
+
+del "%GPU_INFO_FILE%" >nul 2>&1
+
+if not defined GPU_TIER (
+    echo.
+    echo [ERROR] Could not determine ACE-Step GPU configuration.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo [OK] GPU profile detected.
+echo.
+echo   VRAM          : !GPU_VRAM! GB
+echo   ACE-Step tier : !GPU_TIER!
+echo   Recommended LM: !GPU_RECOMMENDED_LM!
+echo   Supported LMs : !GPU_AVAILABLE_LM!
+echo.
+
+REM ------------------------------------------------------------
+REM Choose ACE-Step quality profile
+REM ------------------------------------------------------------
+
+echo.
+echo ============================================================
+echo ACE-Step Quality Profile
+echo ============================================================
+echo.
+echo   [1] Fast
+echo       Turbo model, 8 steps, 0.6B LM
+echo.
+echo   [2] Balanced
+echo       XL-Turbo, 20 steps, recommended LM
+echo.
+echo   [3] High Quality
+echo       XL-SFT, 50 steps, recommended LM
+echo.
+echo   [4] Maximum Quality
+echo       XL-SFT, 50 steps, 4B LM
+echo       May exceed the recommended LM for this GPU.
+echo.
+echo   [5] Auto Detect [Recommended]
+echo       XL-SFT, 50 steps, ACE-Step recommended LM
+echo.
+
+set "QUALITY_CHOICE="
+set /p "QUALITY_CHOICE=Choose quality [1-5, default 5]: "
+
+if "!QUALITY_CHOICE!"=="" set "QUALITY_CHOICE=5"
+
+if "!QUALITY_CHOICE!"=="1" (
+    set "MUSER_ACESTEP_DIT_MODEL=acestep-v15-turbo"
+    set "MUSER_ACESTEP_LM_MODEL=acestep-5Hz-lm-0.6B"
+    set "MUSER_ACESTEP_INFER_STEP=8"
+) else if "!QUALITY_CHOICE!"=="2" (
+    set "MUSER_ACESTEP_DIT_MODEL=acestep-v15-xl-turbo"
+    set "MUSER_ACESTEP_LM_MODEL=!GPU_RECOMMENDED_LM!"
+    set "MUSER_ACESTEP_INFER_STEP=20"
+) else if "!QUALITY_CHOICE!"=="3" (
+    set "MUSER_ACESTEP_DIT_MODEL=acestep-v15-xl-sft"
+    set "MUSER_ACESTEP_LM_MODEL=!GPU_RECOMMENDED_LM!"
+    set "MUSER_ACESTEP_INFER_STEP=50"
+) else if "!QUALITY_CHOICE!"=="4" (
+    set "MUSER_ACESTEP_DIT_MODEL=acestep-v15-xl-sft"
+    set "MUSER_ACESTEP_LM_MODEL=acestep-5Hz-lm-4B"
+    set "MUSER_ACESTEP_INFER_STEP=50"
+) else (
+    set "MUSER_ACESTEP_DIT_MODEL=acestep-v15-xl-sft"
+    set "MUSER_ACESTEP_LM_MODEL=!GPU_RECOMMENDED_LM!"
+    set "MUSER_ACESTEP_INFER_STEP=50"
+)
+
+set "ACESTEP_CONFIG_PATH=!MUSER_ACESTEP_DIT_MODEL!"
+set "ACESTEP_LM_MODEL_PATH=!MUSER_ACESTEP_LM_MODEL!"
+
+echo.
+echo Selected ACE-Step profile:
+echo   DiT model : !MUSER_ACESTEP_DIT_MODEL!
+echo   LM model  : !MUSER_ACESTEP_LM_MODEL!
+echo   Steps     : !MUSER_ACESTEP_INFER_STEP!
+echo.
+
+
+REM ------------------------------------------------------------
 REM Make sure ACE-Step API is running
 REM ------------------------------------------------------------
 

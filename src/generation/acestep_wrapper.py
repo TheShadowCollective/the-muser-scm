@@ -443,7 +443,7 @@ def _generate_audio_v15_api(
         "batch_size": num_candidates,
         "task_type": task_type,
         "audio_format": "wav",
-        "config_path": ACESTEP_V15_DIT_MODEL,
+        "model": ACESTEP_V15_DIT_MODEL,
         "lm_model_path": ACESTEP_V15_LM_MODEL,
     }
     if bpm is not None:
@@ -596,7 +596,7 @@ def generate_audio(
     if seed is None:
         seed = int(time.time()) % (2**31)
     if infer_step is None:
-        infer_step = ACESTEP_INFER_STEP if ACESTEP_VERSION == "v10" else 8
+        infer_step = ACESTEP_INFER_STEP
     if guidance_scale is None:
         guidance_scale = ACESTEP_GUIDANCE_SCALE if ACESTEP_VERSION == "v10" else 7.0
 
