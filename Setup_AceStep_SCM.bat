@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 REM ============================================================
 REM Muser - ACE-Step SCM Environment Setup
@@ -33,9 +33,9 @@ if not exist "%ACESTEP_DIR%\scripts\scm\bootstrap_scm_environment.bat" (
     set "INSTALL_ACESTEP="
     set /p "INSTALL_ACESTEP=Install ACE-Step SCM now? [Y/n] (Recommended): "
 
-    if "%INSTALL_ACESTEP%"=="" set "INSTALL_ACESTEP=Y"
+    if "!INSTALL_ACESTEP!"=="" set "INSTALL_ACESTEP=Y"
 
-    if /I not "%INSTALL_ACESTEP%"=="Y" (
+    if /I not "!INSTALL_ACESTEP!"=="Y" (
         echo.
         echo ACE-Step SCM installation skipped.
         echo.
