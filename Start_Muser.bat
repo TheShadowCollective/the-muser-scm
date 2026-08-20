@@ -68,19 +68,163 @@ echo Checking Ollama...
 ollama --version >nul 2>&1
 
 if errorlevel 1 (
+    REM Ollama may be installed but not visible to this CMD session.
+    if exist "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" (
+        set "PATH=%LOCALAPPDATA%\Programs\Ollama;%PATH%"
+    )
+)
+
+ollama --version >nul 2>&1
+
+if errorlevel 1 (
     echo.
-    echo [ERROR] Ollama is not installed or is not available on PATH.
+    echo Ollama is not installed.
     echo.
     echo Muser requires Ollama to run the qwen3:14b orchestration model.
     echo.
-    echo Please install Ollama, then run Start_Muser.bat again.
+
+echo.
+echo ============================================================
+echo                    DISK SPACE NOTICE
+echo ============================================================
+echo.
+echo Muser requires several large components for first-time setup.
+echo.
+echo   Ollama installer download : approximately 1.5 GB
+echo   qwen3:14b model            : approximately 9.3 GB
+echo   ACE-Step SCM               : additional space required
+echo.
+echo The complete Muser environment requires significantly more
+echo disk space than the Muser application itself.
+echo.
+echo Please make sure you have sufficient free disk space before
+echo continuing with the installation.
+echo.
+echo ============================================================
+echo.
+
+    set "INSTALL_OLLAMA="
+    set /p "INSTALL_OLLAMA=Install Ollama now? [Y/n] (Recommended): "
+
+    if "!INSTALL_OLLAMA!"=="" set "INSTALL_OLLAMA=Y"
+
+    if /I not "!INSTALL_OLLAMA!"=="Y" (
+        echo.
+        echo Ollama installation skipped.
+        echo.
+        pause
+        exit /b 1
+    )
+
     echo.
-    pause
-    exit /b 1
+    echo Installing Ollama...
+    echo.
+
+    winget --version >nul 2>&1
+
+    if not errorlevel 1 (
+        echo [INFO] Installing Ollama with WinGet...
+        echo.
+
+        winget install ^
+            --id Ollama.Ollama ^
+            --exact ^
+            --accept-source-agreements ^
+            --accept-package-agreements
+
+        if errorlevel 1 (
+            echo.
+            echo [WARNING] WinGet installation failed.
+            echo [INFO] Trying the official Ollama installer...
+            echo.
+
+            powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+                "irm https://ollama.com/install.ps1 | iex"
+
+            if errorlevel 1 (
+                echo.
+                echo [ERROR] Ollama installation failed.
+                echo.
+                pause
+                exit /b 1
+            )
+        )
+    ) else (
+        echo [INFO] WinGet was not found.
+        echo [INFO] Using the official Ollama installer...
+        echo.
+
+        powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+            "irm https://ollama.com/install.ps1 | iex"
+
+        if errorlevel 1 (
+            echo.
+            echo [ERROR] Ollama installation failed.
+            echo.
+            pause
+            exit /b 1
+        )
+    )
+
+    REM A newly installed application may not yet be visible
+    REM in the PATH inherited by this CMD process.
+    if exist "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" (
+        set "PATH=%LOCALAPPDATA%\Programs\Ollama;%PATH%"
+    )
+
+    echo.
+    echo Verifying Ollama installation...
+    echo.
+
+    ollama --version >nul 2>&1
+
+    if errorlevel 1 (
+        echo.
+        echo [ERROR] Ollama was installed but could not be started from this terminal.
+        echo.
+        echo Expected location:
+        echo   %LOCALAPPDATA%\Programs\Ollama\ollama.exe
+        echo.
+        pause
+        exit /b 1
+    )
+
+    echo [OK] Ollama installed successfully.
+) else (
+    echo [OK] Ollama found.
 )
 
-echo [OK] Ollama found.
 echo.
+
+
+
+echo Checking Ollama service...
+
+ollama list >nul 2>&1
+
+if errorlevel 1 (
+    echo [INFO] Ollama service is not responding. Starting Ollama...
+
+    start "" /B ollama serve >nul 2>&1
+
+    REM Give the Ollama server a few seconds to initialize.
+    timeout /t 3 /nobreak >nul
+
+    ollama list >nul 2>&1
+
+    if errorlevel 1 (
+        echo.
+        echo [ERROR] Ollama is installed but its service could not be started.
+        echo.
+        pause
+        exit /b 1
+    )
+)
+
+echo [OK] Ollama service is running.
+echo.
+
+
 
 echo Checking qwen3:14b...
 
@@ -89,6 +233,17 @@ ollama list | findstr /I /C:"qwen3:14b" >nul 2>&1
 if errorlevel 1 (
     echo qwen3:14b is not installed.
     echo.
+
+echo ============================================================
+echo                    DISK SPACE NOTICE
+echo ============================================================
+echo.
+echo qwen3:14b requires approximately 9.3 GB of disk space.
+echo.
+echo Make sure you have enough free space before downloading.
+echo.
+echo ============================================================
+echo.
 
     set "PULL_QWEN="
     set /p "PULL_QWEN=Download qwen3:14b now? [Y/n] (Recommended): "
