@@ -99,6 +99,7 @@ def _handle_create_composition_plan(inputs: dict) -> dict:
             "title": inputs.get("title", "Untitled"),
             "genre": inputs.get("genre", ""),
             "status": "planning",
+            "target_duration_s": inputs.get("target_duration_s", 0),
         }
     )
     state.form_plan = {

@@ -10,7 +10,7 @@ echo ============================================================
 echo.
 
 REM Start the ACE-Step API server in its own window.
-start "ACE-Step API - XL Turbo" cmd /k "start_api_server.bat"
+start "ACE-Step API - XL" /D "%~dp0models\ace-step-v15" cmd /k "call scripts\scm\start_api_server_scm.bat"
 
 echo Waiting for ACE-Step API server...
 echo.

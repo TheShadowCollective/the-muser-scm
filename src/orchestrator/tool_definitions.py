@@ -62,6 +62,10 @@ GENERATION_TOOLS = [
                     "type": "string",
                     "description": "Emotional character or mood of the piece",
                 },
+                "target_duration_s": {
+                    "type": "integer",
+                    "description": "Explicit user-requested target duration in seconds. Preserve this exactly when the user specifies a duration.",
+                },
                 "duration_estimate_s": {
                     "type": "integer",
                     "description": "Estimated duration in seconds",

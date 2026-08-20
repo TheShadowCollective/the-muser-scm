@@ -129,6 +129,7 @@ class CreateCompositionPlan(BaseModel):
     tempo: int = Field(default=0, ge=0, le=400)
     time_signature: str = "4/4"
     mood: str = ""
+    target_duration_s: int = Field(default=0, ge=0, le=600)
     duration_estimate_s: int = 0
 
 
